@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - University of Barishal Research Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=EB+Garamond:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <!-- Left Side: Brand & Visual -->
+        <div class="login-brand-side">
+            <div class="brand-content">
+                <div class="brand-logo">
+                    <i class="ph-fill ph-student"></i>
+                </div>
+                <h1>University Of Barishal</h1>
+                <h2>Research Portal</h2>
+                <p class="brand-quote">"Empowering the future through knowledge, innovation, and research excellence."</p>
+            </div>
+            <div class="brand-overlay"></div>
+        </div>
+
+        <!-- Right Side: Login Form -->
+        <div class="login-form-side">
+            <div class="form-wrapper">
+                <div class="form-header">
+                    <h3>Welcome Back</h3>
+                    <p>Please sign in to access your dashboard.</p>
+                </div>
+                
+                <form class="login-form" action="dashboard.html"> <!-- Linking to dashboard for demo -->
+                    <div class="input-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-envelope-simple"></i>
+                            <input type="email" id="email" placeholder="name@barishal.edu.bd" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-lock-key"></i>
+                            <input type="password" id="password" placeholder="Enter your password" required>
+                            <button type="button" class="toggle-password" aria-label="Toggle Password Visibility">
+                                <i class="ph ph-eye-slash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <label class="checkbox-container">
+                            <input type="checkbox">
+                            <span class="checkmark"></span>
+                            Remember me
+                        </label>
+                        <a href="#" class="forgot-password">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-login">
+                        Sign In <i class="ph ph-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="form-footer">
+                    <p>Don't have an account? <a href="#">Request Access</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
