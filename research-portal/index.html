@@ -100,6 +100,18 @@
         </div>
     </header>
 
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Advancing Knowledge, Shaping the Future</h1>
+            <p>Discover groundbreaking research and scholarly articles from the University of Barishal.</p>
+            <div class="hero-actions">
+                <a href="#journal-list" class="btn btn-primary hero-btn">Explore Journals</a>
+                <button class="btn btn-secondary hero-btn">Submit Link</button>
+            </div>
+        </div>
+    </section>
+
     <div class="layout-container">
         <!-- LEFT SIDEBAR: JOURNAL LIST -->
         <aside class="sidebar-left">
@@ -473,18 +485,14 @@
     <!-- NOTIFICATION MODAL -->
     <div id="notification-modal" class="modal hidden">
         <div class="modal-content" style="max-width: 500px;">
-            <span class="close-modal close-notif-modal">&times;</span>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h2 id="notif-modal-title" style="margin: 0;">All Notifications</h2>
-                <a href="#" class="mark-read-modal" style="font-size: 0.85rem; color: var(--vellum-gold); font-weight: 600; text-decoration: none;">Mark all as read</a>
+            <div class="modal-header">
+                <h2>All Notifications</h2>
+                <a href="#" class="mark-read-modal" style="font-size: 0.9rem; color: var(--vellum-gold); font-weight: 600; text-decoration: none;">Mark all as read</a>
             </div>
-            <div class="modal-body-scroll" style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+            <div class="modal-body">
                 <ul class="notification-list" id="full-notification-list">
                     <!-- Dynamic Content -->
                 </ul>
-            </div>
-            <div style="margin-top: 1.5rem; text-align: right;">
-                <button class="btn btn-primary close-notif-btn">Close</button>
             </div>
         </div>
     </div>
