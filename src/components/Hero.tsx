@@ -20,11 +20,11 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-4 py-24 sm:py-32">
+    <div className="relative overflow-hidden bg-slate-900 px-4 py-24 sm:py-32">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto">
@@ -37,7 +37,7 @@ const Hero: React.FC = () => {
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4 leading-tight">
-            University Research <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-purple-500 bg-clip-text text-transparent">Journal System</span>
+            University Research <span className="text-blue-600">Journal System</span>
           </h1>
 
           <p className="text-slate-300 max-w-3xl mx-auto mb-8 text-lg sm:text-xl leading-relaxed">
@@ -60,7 +60,7 @@ const Hero: React.FC = () => {
               />
               <button
                 type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3 sm:p-4 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-blue-500/50"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-3 sm:p-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-lg"
               >
                 <Search className="w-5 h-5" />
               </button>
@@ -99,7 +99,7 @@ const Hero: React.FC = () => {
                 key={index}
                 className="relative group bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm p-6 sm:p-8 rounded-xl border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 rounded-xl transition-all duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-blue-500/0 group-hover:from-blue-500/5 group-hover:to-blue-500/5 rounded-xl transition-all duration-300"></div>
 
                 <div className="relative z-10 flex flex-col items-center">
                   <Icon className="w-10 h-10 text-blue-400 mb-3 group-hover:scale-110 transition-transform duration-300" />
@@ -113,7 +113,7 @@ const Hero: React.FC = () => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12 sm:mt-16">
-          <button className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-blue-500/50">
+          <button className="w-full sm:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-lg">
             Start Exploring
           </button>
           <button className="w-full sm:w-auto px-8 py-3 bg-slate-800/50 text-blue-400 font-semibold rounded-lg border border-slate-700 hover:bg-slate-700/50 hover:border-blue-500/50 transition-all duration-300">

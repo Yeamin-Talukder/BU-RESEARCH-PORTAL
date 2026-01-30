@@ -5,6 +5,7 @@ import DashboardStats from './components/DashboardStats';
 import Login from './components/Login';
 import Register from './components/Register';
 import AuthorDashboard from './components/AuthorDashboard'; // The new dashboard we created
+import PaperBrowser from './components/PaperBrowser';
 import { useAuth } from './context/AuthContext';
 import { FileText, Download, BookOpen, Eye, Star } from 'lucide-react';
 
@@ -12,7 +13,7 @@ const App: React.FC = () => {
   const { user, login } = useAuth();
   
   // State to manage which page is currently visible
-  const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'register'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'register' | 'papers'>('home');
   const [hoveredPaper, setHoveredPaper] = useState<number | null>(null);
 
   // Handle Login: Update Auth Context and redirect to Home
@@ -62,7 +63,7 @@ const App: React.FC = () => {
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-20 -right-20 w-60 h-60 bg-blue-200/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-purple-200/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-blue-200/10 rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4">
@@ -83,7 +84,7 @@ const App: React.FC = () => {
                 key={paper.id}
                 onMouseEnter={() => setHoveredPaper(paper.id)}
                 onMouseLeave={() => setHoveredPaper(null)}
-                className="group relative overflow-hidden bg-white rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer"
+                className="group relative overflow-hidden bg-slate-50 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="relative p-6 md:p-8 h-full flex flex-col">
@@ -96,7 +97,7 @@ const App: React.FC = () => {
                       <span className="text-xs font-semibold">{paper.rating}</span>
                     </div>
                   </div>
-                  <h4 className="text-lg md:text-xl font-semibold text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors line-clamp-2">
+                  <h4 className="text-lg md:text-xl font-semibold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
                     {paper.title}
                   </h4>
                   <p className="text-sm text-slate-600 mb-4 line-clamp-2 flex-grow">
@@ -110,7 +111,7 @@ const App: React.FC = () => {
                     <span className="flex items-center gap-1 text-xs text-slate-500">
                       <Eye className="w-3.5 h-3.5" /> {paper.views}
                     </span>
-                    <button className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold transition-all duration-300 ${hoveredPaper === paper.id ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 text-slate-700'}`}>
+                    <button className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold transition-all duration-300 ${hoveredPaper === paper.id ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-slate-700'}`}>
                       <Download className="w-4 h-4" /> <span className="text-sm">PDF</span>
                     </button>
                   </div>
@@ -125,7 +126,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50 font-sans antialiased">
+      <div className="min-h-screen bg-slate-50 font-sans antialiased">
       <Navbar onNavigate={setCurrentPage} />
 
       {/* --- PAGE ROUTING LOGIC --- */}
@@ -143,7 +144,12 @@ const App: React.FC = () => {
         <Register onSwitchToLogin={() => setCurrentPage('login')} />
       )}
 
-      {/* 3. HOME / DASHBOARD PAGE */}
+      {/* 3. PAPERS BROWSER PAGE */}
+      {currentPage === 'papers' && (
+        <PaperBrowser />
+      )}
+
+      {/* 4. HOME / DASHBOARD PAGE */}
       {currentPage === 'home' && (
         <>
           {/* SCENARIO A: LOGGED IN AS AUTHOR */}
@@ -162,7 +168,7 @@ const App: React.FC = () => {
         </>
       )}
 
-      <footer className="bg-gradient-to-r from-slate-900 to-slate-800 text-slate-300 py-8 mt-auto border-t border-slate-800">
+      <footer className="bg-slate-900 text-slate-300 py-8 mt-auto border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">

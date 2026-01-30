@@ -46,8 +46,8 @@ const DashboardStats: React.FC = () => {
             label: 'Papers Assigned',
             value: '12',
             icon: FileText,
-            bgGradient: 'from-purple-50 to-purple-100',
-            iconColor: 'from-purple-500 to-purple-600',
+            bgGradient: 'from-blue-50 to-blue-100',
+            iconColor: 'from-blue-500 to-blue-600',
             trend: '+3 pending',
             trendUp: true,
           },
@@ -64,8 +64,8 @@ const DashboardStats: React.FC = () => {
             label: 'Active Reviewers',
             value: '8',
             icon: Users,
-            bgGradient: 'from-cyan-50 to-cyan-100',
-            iconColor: 'from-cyan-500 to-cyan-600',
+            bgGradient: 'from-blue-50 to-blue-100',
+            iconColor: 'from-blue-500 to-blue-600',
             trend: '2 new this week',
             trendUp: true,
           },
@@ -76,8 +76,8 @@ const DashboardStats: React.FC = () => {
             label: 'Total Users',
             value: '1,204',
             icon: Users,
-            bgGradient: 'from-indigo-50 to-indigo-100',
-            iconColor: 'from-indigo-500 to-indigo-600',
+            bgGradient: 'from-blue-50 to-blue-100',
+            iconColor: 'from-blue-500 to-blue-600',
             trend: '+45 new users',
             trendUp: true,
           },
@@ -142,11 +142,11 @@ const DashboardStats: React.FC = () => {
   const stats = getStats();
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-50 px-4 py-12 md:py-16">
+    <div className="relative overflow-hidden bg-slate-50 px-4 py-12 md:py-16">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-200/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-purple-200/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute -bottom-32 -left-32 w-80 h-80 bg-blue-200/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
@@ -224,7 +224,7 @@ const DashboardStats: React.FC = () => {
         </div>
 
         {/* Footer Summary */}
-        <div className="mt-12 p-6 md:p-8 bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl text-white shadow-xl border border-slate-700/50">
+        <div className="mt-12 p-6 md:p-8 bg-slate-900 rounded-2xl text-white shadow-xl border border-slate-700/50">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center md:text-left">
               <p className="text-slate-400 text-sm mb-2">Last Updated</p>

@@ -176,12 +176,12 @@ const SubmitPaper: React.FC<SubmitPaperProps> = ({ onCancel, onSubmitSuccess }) 
             ref={dropRef}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
-            className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${file ? 'border-green-400 bg-green-50' : 'border-slate-300 hover:border-indigo-400 bg-white'} relative`}
+            className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${file ? 'border-green-400 bg-green-50' : 'border-slate-300 hover:border-blue-400 bg-slate-50'} relative`}
           >
             {file ? (
               <div className="flex items-center justify-between gap-3 text-slate-700">
                 <div className="flex items-center gap-3">
-                  <FileText className="w-8 h-8 text-indigo-600" />
+                  <FileText className="w-8 h-8 text-blue-600" />
                   <div className="text-left">
                     <div className="font-medium">{file.name}</div>
                     <div className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB • PDF</div>
@@ -213,7 +213,7 @@ const SubmitPaper: React.FC<SubmitPaperProps> = ({ onCancel, onSubmitSuccess }) 
             {isSubmitting && (
               <div className="mt-4">
                 <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-indigo-600 transition-all" style={{ width: `${uploadProgress}%` }} />
+                  <div className="h-full bg-blue-600 transition-all" style={{ width: `${uploadProgress}%` }} />
                 </div>
                 <div className="text-xs text-slate-500 mt-2">Uploading... {uploadProgress}%</div>
               </div>
