@@ -155,8 +155,18 @@ document.addEventListener('DOMContentLoaded', () => {
         { icon: 'ph-warning-circle', type: 'info', text: 'Please update your profile information.', time: '4 days ago' },
         { icon: 'ph-file-pdf', type: '', text: 'New issue of <strong>IEEE Transactions</strong> available.', time: '5 days ago' },
         { icon: 'ph-user-plus', type: 'success', text: 'You have a new follower: <strong>Dr. S. Huda</strong>.', time: '1 week ago' },
-        { icon: 'ph-bell', type: '', text: 'Reminder: Submit your progress report.', time: '1 week ago' }
+        { icon: 'ph-bell', type: '', text: 'Reminder: Submit your progress report.', time: '1 week ago' },
+        { icon: 'ph-calendar', type: '', text: 'Meeting with supervisor scheduled for tomorrow.', time: '1 week ago' },
+        { icon: 'ph-medal', type: 'success', text: '<strong>Award</strong>: Best Paper Nomination.', time: '2 weeks ago' },
+        { icon: 'ph-chat-circle-dots', type: '', text: 'New discussion in "AI Ethics" group.', time: '2 weeks ago' },
+        { icon: 'ph-upload-simple', type: '', text: 'Dataset upload completed successfully.', time: '3 weeks ago' },
+        { icon: 'ph-envelope', type: '', text: 'Invitation to review a manuscript.', time: '3 weeks ago' },
+        { icon: 'ph-gear', type: 'info', text: 'Account security update required.', time: '1 month ago' },
+        { icon: 'ph-book', type: '', text: 'New book added to library: "Deep Learning".', time: '1 month ago' }
     ];
+
+    // Duplicate data to ensure scrolling
+    const extendedNotifications = [...allNotifications, ...allNotifications, ...allNotifications, ...allNotifications];
 
     if (viewAllNotifBtn && notifModal) {
         viewAllNotifBtn.addEventListener('click', (e) => {
@@ -165,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (notificationPanel) notificationPanel.classList.remove('active');
 
             // Populate Modal
-            fullNotifList.innerHTML = allNotifications.map(n => `
+            fullNotifList.innerHTML = extendedNotifications.map(n => `
                 <li class="notification-item ${n.type ? '' : 'unread'}">
                     <div class="notif-icon ${n.type}"><i class="ph ${n.icon}"></i></div>
                     <div class="notif-content">
@@ -177,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Open Modal
             notifModal.classList.remove('hidden');
+            document.body.classList.add('no-scroll');
             requestAnimationFrame(() => notifModal.classList.add('active'));
         });
     }
@@ -340,6 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeNotifModal = () => {
         if (!notifModal) return;
         notifModal.classList.remove('active');
+        document.body.classList.remove('no-scroll');
         // setTimeout(() => notifModal.classList.add('hidden'), 300); // Optional
     };
 
@@ -413,9 +425,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Toggle icon
             const icon = fabFilterBtn.querySelector('i');
             if (rightSidebar.classList.contains('active')) {
-                icon.classList.replace('ph-magnifying-glass', 'ph-x');
+                icon.classList.replace('ph-funnel', 'ph-x');
             } else {
-                icon.classList.replace('ph-x', 'ph-magnifying-glass');
+                icon.classList.replace('ph-x', 'ph-funnel');
             }
         });
     }
@@ -434,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 fabFilterBtn.classList.remove('active');
                 // Reset icon
                 const icon = fabFilterBtn.querySelector('i');
-                if (icon) icon.classList.replace('ph-x', 'ph-magnifying-glass');
+                if (icon) icon.classList.replace('ph-x', 'ph-funnel');
             }
         }
     });
