@@ -79,17 +79,14 @@ export default defineConfig([
   },
 ])
 ```
-=======
-Author 01
-        MD Yeamin Talukder
-        Roll: 22 CSE 020
->>>>>>> 82c19b2e7618ac9f713af157df7b9565354032c2
+
+
 
 <p align="center">
   Streamlining university research submission, peer review, and publication.
 </p>
 
-<<<<<<< HEAD
+
 ---
 
 ## 📌 Overview
@@ -187,9 +184,4 @@ This project was developed for academic purposes.
 <p align="center">
   ⭐ If you like this project, consider giving it a star on GitHub!
 </p>
-=======
-Author 04
-        Md Abdullah Al Noman
-        Roll: 22 CSE 038
->>>>>>> e0f41ed682cbb41aacfc00141251bdb57888d21b
->>>>>>> 82c19b2e7618ac9f713af157df7b9565354032c2
+
