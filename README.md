@@ -1,11 +1,11 @@
-<<<<<<< HEAD
+
 <!-- PROJECT TITLE -->
 <h1 align="center">🎓 BU Research Space</h1>
 <p align="center">
   <strong>A Web-Based Academic Research Submission & Review Management System</strong>
 </p>
 =======
-<<<<<<< HEAD
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
