@@ -1,118 +1,137 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from 'sonner';
 
 interface RegisterProps {
   onSwitchToLogin: () => void;
+  onRegisterSuccess: (email: string) => void;
 }
 
-const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
+const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onRegisterSuccess }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Demo: show a friendly message; backend will handle actual registration
-    console.log('Registering', { name, email });
-    alert(`Thanks ${name || 'user'} — registration requested. Please check your email.`);
-    onSwitchToLogin();
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      toast.success('Registration successful! Please verify your email.');
+      onRegisterSuccess(email);
+    } catch (err: any) {
+      toast.error(err.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <div className="relative w-full max-w-lg">
         <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-blue-300 rounded-3xl blur opacity-30 animate-pulse"></div>
-        <div className="relative bg-slate-50 backdrop-blur-sm p-8 rounded-3xl shadow-2xl border border-slate-200 z-10">
-          <div className="text-center mb-8 animate-fade-in">
-            <div className="mx-auto mb-4 w-16 h-16 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white shadow-lg transform hover:scale-110 transition-transform duration-300">
+
+        <Card className="relative border-slate-200 shadow-2xl">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
               <User className="w-6 h-6" />
             </div>
-            <h2 className="text-2xl font-extrabold text-slate-900">Create an account</h2>
-            <p className="text-sm text-slate-700 mt-2">Join the research community and start collaborating</p>
-          </div>
+            <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+            <CardDescription>
+              Join the research community and start collaborating
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              <label className="block text-xs font-semibold text-slate-700 mb-2">Full name</label>
-              <div className="relative group">
-                <User className="absolute left-3 top-3 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-300 hover:border-slate-300"
-                  placeholder="Dr. Jane Doe"
-                  required
-                />
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-2.5 w-5 h-5 text-slate-400" />
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <label className="block text-xs font-semibold text-slate-700 mb-2">Email address</label>
-              <div className="relative group">
-                <Mail className="absolute left-3 top-3 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-300 hover:border-slate-300"
-                  placeholder="you@university.edu"
-                  required
-                />
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-2.5 w-5 h-5 text-slate-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <label className="block text-xs font-semibold text-slate-700 mb-2">Password</label>
-              <div className="relative group">
-                <Lock className="absolute left-3 top-3 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none transition-all duration-300 hover:border-slate-300"
-                  placeholder="Create a strong password"
-                  required
-                />
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-2.5 w-5 h-5 text-slate-400" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+                <p className="text-xs text-slate-500">Use at least 8 characters</p>
               </div>
-              <p className="text-xs text-slate-700 mt-2">Use at least 8 characters, including a number and a symbol.</p>
+
+              <Button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
+                disabled={loading}
+              >
+                {loading ? 'Creating Account...' : 'Create Account'}
+                {!loading && <ArrowRight className="ml-2 w-4 h-4" />}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-center">
+            <div className="text-sm text-slate-600">
+              Already have an account?{' '}
+              <button onClick={onSwitchToLogin} className="text-blue-600 font-semibold hover:underline outline-none">
+                Log in
+              </button>
             </div>
-
-            <button 
-              type="submit" 
-              className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 group animate-fade-in"
-              style={{ animationDelay: '0.4s' }}
-            >
-              Create Account 
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </form>
-
-          <div className="mt-6 text-center text-sm text-slate-700 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            Already have an account?{' '}
-            <button onClick={onSwitchToLogin} className="text-blue-600 font-semibold hover:underline">
-              Log in
-            </button>
-          </div>
-        </div>
+          </CardFooter>
+        </Card>
       </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.5s ease-out forwards;
-          opacity: 0;
-        }
-      `}</style>
     </div>
   );
 };

@@ -7,215 +7,126 @@ import {
   Calendar,
   Download,
   Eye,
-  FileText,
-  X,
   ChevronLeft,
   ChevronRight,
-  Star,
-  Tag
+  Tag,
+  X,
+  ArrowRight
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-interface Paper {
+interface PublishedPaper {
   id: string;
+  _id?: string;
   title: string;
   abstract: string;
-  authors: string[];
+  authorName: string;
+  authorId?: string;
+  authors?: string[];
   status: string;
-  submissionDate: string;
-  department: string;
-}
-
-interface PublishedPaper extends Paper {
-  journal: string;
-  faculty: string;
-  publicationDate: string;
-  doi?: string;
-  keywords: string[];
-  fullText: string;
-  citations: number;
-  downloads: number;
-  editor: string;
-  reviewers: string[];
-}
-
-interface Journal {
-  id: string;
-  name: string;
-  faculty: string;
-  department: string;
-  editor: string;
-  description: string;
-  status: 'Active' | 'Inactive';
-}
-
-interface SearchFilters {
-  query: string;
-  author: string;
-  journal: string;
-  department: string;
-  faculty: string;
-  year: string;
-  keywords: string[];
+  createdAt: string;
+  decisionDate?: string;
+  publicationDate?: string;
+  keywords: string[] | string;
+  journalName?: string;
+  journal?: string;
+  university?: string;
+  department?: string;
+  faculty?: string;
+  views?: number;
+  downloads?: number;
+  citations?: number;
 }
 
 interface PaperBrowserProps {
-  publishedPapers?: PublishedPaper[];
-  journals?: Journal[];
-  onDownloadPaper?: (paperId: string) => void;
-  onViewPaper?: (paperId: string) => void;
+  initialPapers?: PublishedPaper[];
 }
 
-const PaperBrowser: React.FC<PaperBrowserProps> = ({
-  publishedPapers,
-  journals,
-  onDownloadPaper,
-  onViewPaper
-}) => {
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
+const PaperBrowser: React.FC<PaperBrowserProps> = ({ initialPapers }) => {
+  const navigate = useNavigate();
+  const [papers, setPapers] = useState<PublishedPaper[]>(initialPapers || []);
+  const [isLoading, setIsLoading] = useState(!initialPapers);
+
+  const [searchFilters, setSearchFilters] = useState({
     query: '',
     author: '',
     journal: '',
     department: '',
-    faculty: '',
     year: '',
-    keywords: []
+    keywords: [] as string[],
+    minViews: '',
+    maxViews: '',
+    minDownloads: '',
+    maxDownloads: ''
   });
 
-  const [filteredPapers, setFilteredPapers] = useState<PublishedPaper[]>([]);
-  const [selectedPaper, setSelectedPaper] = useState<PublishedPaper | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'detail'>('list');
-  const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [papersPerPage] = useState(10);
+  const [papersPerPage] = useState(8); // Display 8 per page
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  // Mock data for demonstration
-  const defaultPapers: PublishedPaper[] = [
-    {
-      id: '1',
-      title: 'Machine Learning Applications in Healthcare: A Comprehensive Review',
-      abstract: 'This paper provides a comprehensive review of machine learning applications in healthcare, covering diagnostic systems, treatment optimization, and predictive analytics. The study analyzes current trends and future directions in ML-driven healthcare solutions.',
-      authors: ['Dr. Sarah Johnson', 'Prof. Michael Chen'],
-      status: 'Published',
-      submissionDate: '2024-01-15',
-      department: 'Computer Science',
-      journal: 'Journal of Computer Science',
-      faculty: 'Engineering',
-      publicationDate: '2024-06-15',
-      doi: '10.1234/jcs.2024.001',
-      keywords: ['Machine Learning', 'Healthcare', 'AI', 'Medical Diagnosis'],
-      fullText: 'Full text content would be here...',
-      citations: 45,
-      downloads: 1200,
-      editor: 'Dr. Emily Davis',
-      reviewers: ['Prof. Alex Rivera', 'Dr. Lisa Wang']
-    },
-    {
-      id: '2',
-      title: 'Sustainable Energy Solutions for Urban Development',
-      abstract: 'This research explores sustainable energy solutions for urban development, focusing on renewable energy integration, smart grid technologies, and policy frameworks for sustainable cities.',
-      authors: ['Prof. Alex Rivera', 'Dr. Maria Gonzalez'],
-      status: 'Published',
-      submissionDate: '2024-02-20',
-      department: 'Environmental Engineering',
-      journal: 'Journal of Sustainable Engineering',
-      faculty: 'Engineering',
-      publicationDate: '2024-07-10',
-      doi: '10.1234/jse.2024.002',
-      keywords: ['Sustainable Energy', 'Urban Development', 'Renewable Energy', 'Smart Grid'],
-      fullText: 'Full text content would be here...',
-      citations: 32,
-      downloads: 890,
-      editor: 'Prof. David Kim',
-      reviewers: ['Dr. Sarah Johnson', 'Prof. Robert Lee']
-    },
-    {
-      id: '3',
-      title: 'Advances in Quantum Computing Algorithms',
-      abstract: 'This paper presents recent advances in quantum computing algorithms, including quantum search algorithms, optimization techniques, and quantum machine learning approaches.',
-      authors: ['Dr. Lisa Wang', 'Prof. James Wilson'],
-      status: 'Published',
-      submissionDate: '2024-03-10',
-      department: 'Physics',
-      journal: 'Journal of Advanced Physics',
-      faculty: 'Arts & Sciences',
-      publicationDate: '2024-08-05',
-      doi: '10.1234/jap.2024.003',
-      keywords: ['Quantum Computing', 'Algorithms', 'Quantum Search', 'Optimization'],
-      fullText: 'Full text content would be here...',
-      citations: 67,
-      downloads: 2100,
-      editor: 'Dr. Maria Gonzalez',
-      reviewers: ['Prof. Michael Chen', 'Dr. Robert Taylor']
-    }
-  ];
-
-  const defaultJournals: Journal[] = [
-    { id: '1', name: 'Journal of Computer Science', faculty: 'Engineering', department: 'Computer Science', editor: 'Dr. Emily Davis', description: 'Leading journal in computer science research', status: 'Active' },
-    { id: '2', name: 'Journal of Sustainable Engineering', faculty: 'Engineering', department: 'Environmental Engineering', editor: 'Prof. David Kim', description: 'Focus on sustainable engineering solutions', status: 'Active' },
-    { id: '3', name: 'Journal of Advanced Physics', faculty: 'Arts & Sciences', department: 'Physics', editor: 'Dr. Maria Gonzalez', description: 'Cutting-edge research in physics', status: 'Active' }
-  ];
-
-  const displayPapers = publishedPapers || defaultPapers;
-  const displayJournals = journals || defaultJournals;
-
-  // Filter papers based on search criteria
+  // Fetch papers if not provided
   useEffect(() => {
-    let filtered = displayPapers.filter(paper => paper.status === 'Published');
-
-    if (searchFilters.query) {
-      const query = searchFilters.query.toLowerCase();
-      filtered = filtered.filter(paper =>
-        paper.title.toLowerCase().includes(query) ||
-        paper.abstract.toLowerCase().includes(query) ||
-        paper.authors.some(author => author.toLowerCase().includes(query))
-      );
+    if (!initialPapers) {
+      const fetchPapers = async () => {
+        try {
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/papers`);
+          const data = await res.json();
+          const published = data.filter((p: any) => p.status !== 'Rejected' && p.status !== 'Draft');
+          setPapers(published);
+        } catch (error) {
+          console.error("Failed to fetch papers", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchPapers();
     }
+  }, [initialPapers]);
 
-    if (searchFilters.author) {
-      filtered = filtered.filter(paper =>
-        paper.authors.some(author =>
-          author.toLowerCase().includes(searchFilters.author.toLowerCase())
-        )
-      );
-    }
+  // Filtering Logic
+  const filteredPapers = papers.filter(paper => {
+    const q = searchFilters.query.toLowerCase();
+    const matchQuery = !q || 
+      paper.title.toLowerCase().includes(q) || 
+      paper.abstract.toLowerCase().includes(q) ||
+      (paper.authorName && paper.authorName.toLowerCase().includes(q));
 
-    if (searchFilters.journal) {
-      filtered = filtered.filter(paper =>
-        paper.journal.toLowerCase().includes(searchFilters.journal.toLowerCase())
-      );
-    }
+    const matchAuthor = !searchFilters.author || 
+      (paper.authorName && paper.authorName.toLowerCase().includes(searchFilters.author.toLowerCase()));
 
-    if (searchFilters.department) {
-      filtered = filtered.filter(paper =>
-        paper.department.toLowerCase().includes(searchFilters.department.toLowerCase())
-      );
-    }
+    const matchJournal = !searchFilters.journal || 
+      (paper.journalName && paper.journalName.toLowerCase().includes(searchFilters.journal.toLowerCase()));
+      
+    const pKeywords = Array.isArray(paper.keywords) 
+      ? paper.keywords 
+      : (typeof paper.keywords === 'string' ? (paper.keywords as string).split(',') : []);
+      
+    const matchKeywords = searchFilters.keywords.length === 0 || 
+      searchFilters.keywords.every(k => pKeywords.some((pk: string) => pk.toLowerCase().includes(k.toLowerCase())));
 
-    if (searchFilters.faculty) {
-      filtered = filtered.filter(paper =>
-        paper.faculty.toLowerCase().includes(searchFilters.faculty.toLowerCase())
-      );
-    }
+    // Date Filter (Year)
+    const displayDate = paper.decisionDate || paper.createdAt;
+    const paperYear = displayDate ? new Date(displayDate).getFullYear().toString() : '';
+    const matchYear = !searchFilters.year || paperYear === searchFilters.year;
 
-    if (searchFilters.year) {
-      filtered = filtered.filter(paper =>
-        paper.publicationDate.startsWith(searchFilters.year)
-      );
-    }
+    // View Count Filter
+    const views = paper.views || 0;
+    const matchMinViews = !searchFilters.minViews || views >= parseInt(searchFilters.minViews);
+    const matchMaxViews = !searchFilters.maxViews || views <= parseInt(searchFilters.maxViews);
 
-    if (searchFilters.keywords.length > 0) {
-      filtered = filtered.filter(paper =>
-        searchFilters.keywords.some(keyword =>
-          paper.keywords.some(paperKeyword =>
-            paperKeyword.toLowerCase().includes(keyword.toLowerCase())
-          )
-        )
-      );
-    }
+    // Download Count Filter
+    const downloads = paper.downloads || 0;
+    const matchMinDownloads = !searchFilters.minDownloads || downloads >= parseInt(searchFilters.minDownloads);
+    const matchMaxDownloads = !searchFilters.maxDownloads || downloads <= parseInt(searchFilters.maxDownloads);
 
-    setFilteredPapers(filtered);
-    setCurrentPage(1);
-  }, [searchFilters, displayPapers]);
+    return matchQuery && matchAuthor && matchJournal && matchKeywords && matchYear && matchMinViews && matchMaxViews && matchMinDownloads && matchMaxDownloads;
+  }).sort((a, b) => {
+    const dateA = a.decisionDate || a.createdAt ? new Date(a.decisionDate || a.createdAt).getTime() : 0;
+    const dateB = b.decisionDate || b.createdAt ? new Date(b.decisionDate || b.createdAt).getTime() : 0;
+    const validA = isNaN(dateA) ? 0 : dateA;
+    const validB = isNaN(dateB) ? 0 : dateB;
+    return validB - validA;
+  });
 
   // Pagination
   const indexOfLastPaper = currentPage * papersPerPage;
@@ -223,416 +134,317 @@ const PaperBrowser: React.FC<PaperBrowserProps> = ({
   const currentPapers = filteredPapers.slice(indexOfFirstPaper, indexOfLastPaper);
   const totalPages = Math.ceil(filteredPapers.length / papersPerPage);
 
-  const handleViewPaper = (paper: PublishedPaper) => {
-    setSelectedPaper(paper);
-    setViewMode('detail');
-    onViewPaper?.(paper.id);
-  };
-
-  const handleBackToList = () => {
-    setSelectedPaper(null);
-    setViewMode('list');
-  };
-
-  const handleDownload = (paperId: string) => {
-    onDownloadPaper?.(paperId);
+  const handlePaperClick = (id: string) => {
+    navigate(`/paper/${id}`);
   };
 
   const addKeyword = (keyword: string) => {
     if (keyword && !searchFilters.keywords.includes(keyword)) {
-      setSearchFilters({
-        ...searchFilters,
-        keywords: [...searchFilters.keywords, keyword]
-      });
+      setSearchFilters(prev => ({ ...prev, keywords: [...prev.keywords, keyword] }));
     }
   };
 
   const removeKeyword = (keyword: string) => {
-    setSearchFilters({
-      ...searchFilters,
-      keywords: searchFilters.keywords.filter(k => k !== keyword)
-    });
+    setSearchFilters(prev => ({ ...prev, keywords: prev.keywords.filter(k => k !== keyword) }));
   };
 
-  if (viewMode === 'detail' && selectedPaper) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50">
-        {/* Header */}
-        <div className="bg-white shadow-sm border-b border-slate-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between py-6">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={handleBackToList}
-                  className="flex items-center gap-2 text-slate-600 hover:text-slate-900"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                  Back to Papers
-                </button>
-                <div className="h-6 w-px bg-slate-300"></div>
-                <div>
-                  <h1 className="text-2xl font-bold text-slate-900">{selectedPaper.title}</h1>
-                  <p className="text-slate-600 mt-1">
-                    Published in {selectedPaper.journal} • {selectedPaper.publicationDate}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Eye className="w-4 h-4" />
-                  {selectedPaper.downloads} views
-                </div>
-                <button
-                  onClick={() => handleDownload(selectedPaper.id)}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-                >
-                  <Download className="w-4 h-4" />
-                  Download PDF
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Paper Metadata */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Paper Information</h3>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-slate-700">Authors</p>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {selectedPaper.authors.map((author, index) => (
-                        <span key={index} className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-700 text-xs rounded-full">
-                          <Users className="w-3 h-3" />
-                          {author}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-700">Journal</p>
-                    <p className="text-sm text-slate-600">{selectedPaper.journal}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-700">Department</p>
-                    <p className="text-sm text-slate-600">{selectedPaper.department}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-700">Faculty</p>
-                    <p className="text-sm text-slate-600">{selectedPaper.faculty}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-700">Publication Date</p>
-                    <p className="text-sm text-slate-600">{selectedPaper.publicationDate}</p>
-                  </div>
-                  {selectedPaper.doi && (
-                    <div>
-                      <p className="text-sm font-medium text-slate-700">DOI</p>
-                      <p className="text-sm text-slate-600 font-mono">{selectedPaper.doi}</p>
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-sm font-medium text-slate-700">Keywords</p>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {selectedPaper.keywords.map((keyword, index) => (
-                        <span key={index} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-                          <Tag className="w-3 h-3" />
-                          {keyword}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="pt-4 border-t border-slate-200">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-600">Citations</span>
-                      <span className="font-medium">{selectedPaper.citations}</span>
-                    </div>
-                    <div className="flex justify-between text-sm mt-1">
-                      <span className="text-slate-600">Downloads</span>
-                      <span className="font-medium">{selectedPaper.downloads}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Paper Content */}
-            <div className="lg:col-span-3">
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Abstract</h3>
-                <p className="text-slate-700 leading-relaxed mb-8">{selectedPaper.abstract}</p>
-
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Full Text</h3>
-                <div className="prose prose-slate max-w-none">
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
-                    <div className="flex items-center justify-center h-64 text-slate-500">
-                      <div className="text-center">
-                        <FileText className="w-12 h-12 mx-auto mb-4" />
-                        <p className="text-lg font-medium">Paper Content</p>
-                        <p className="text-sm mt-2">Full text would be displayed here</p>
-                        <button
-                          onClick={() => handleDownload(selectedPaper.id)}
-                          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg inline-flex items-center gap-2"
-                        >
-                          <Download className="w-4 h-4" />
-                          Download Full Paper
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+       <div className="min-h-screen bg-archival-bone flex items-center justify-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-oxford-blue"></div>
+       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <h1 className="text-3xl font-bold text-slate-900">Published Papers</h1>
-            <p className="text-slate-600 mt-1">Browse and read published research papers</p>
+    <div className="min-h-screen bg-archival-bone font-body text-classic-ink flex flex-col">
+      {/* Hero Header */}
+      <div className="bg-oxford-blue text-white py-16 md:py-24 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10" style={{
+            backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+            backgroundSize: '30px 30px'
+        }}></div>
+        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
+          <BookOpen className="w-16 h-16 text-vellum-gold mx-auto mb-6 animate-in fade-in zoom-in duration-700" />
+          <h1 className="text-4xl md:text-6xl font-headline font-bold mb-4 tracking-tight drop-shadow-sm">
+            Research Archive
+          </h1>
+          <p className="text-lg md:text-xl text-blue-200 font-body max-w-2xl mx-auto mb-10 leading-relaxed">
+            Explore our curated collection of peer-reviewed articles, groundbreaking studies, and academic journals.
+          </p>
+          
+          {/* Main Search Bar */}
+          <div className="max-w-3xl mx-auto relative group">
+             <div className="absolute inset-0 bg-vellum-gold/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+             <div className="relative flex items-center bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-2 shadow-2xl transition-all duration-300 focus-within:bg-white focus-within:text-classic-ink">
+                <Search className="w-6 h-6 ml-4 text-blue-200 group-focus-within:text-oxford-blue transition-colors" />
+                <input 
+                  type="text"
+                  placeholder="Search titles, authors, or topics..."
+                  value={searchFilters.query}
+                  onChange={(e) => setSearchFilters({ ...searchFilters, query: e.target.value })}
+                  className="w-full bg-transparent border-none outline-none px-4 py-3 text-lg font-ui placeholder:text-blue-200/50 group-focus-within:text-oxford-blue group-focus-within:placeholder:text-slate-400 transition-colors"
+                />
+                <button className="bg-vellum-gold hover:bg-yellow-500 text-oxford-blue px-8 py-3 rounded-full font-bold font-ui transition-transform active:scale-95">
+                   Search
+                </button>
+             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search and Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Main Search */}
-            <div className="flex-1 relative">
-              <Search className="w-5 h-5 absolute left-3 top-3 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search papers by title, author, or abstract..."
-                value={searchFilters.query}
-                onChange={(e) => setSearchFilters({...searchFilters, query: e.target.value})}
-                className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+      <div className="flex-1 max-w-[1600px] mx-auto w-full px-6 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Sidebar Filters */}
+        <aside className={`lg:col-span-3 space-y-8 ${showMobileFilters ? 'block' : 'hidden lg:block'}`}>
+           <div className="sticky top-24 space-y-6">
+              <div className="flex items-center justify-between lg:hidden mb-4">
+                 <h3 className="font-headline font-semibold text-xl">Filters</h3>
+                 <button onClick={() => setShowMobileFilters(false)}><X className="w-5 h-5" /></button>
+              </div>
 
-            {/* Filter Toggle */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 rounded-lg"
-            >
-              <Filter className="w-4 h-4" />
-              Filters
-            </button>
-          </div>
-
-          {/* Advanced Filters */}
-          {showFilters && (
-            <div className="mt-6 pt-6 border-t border-slate-200">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Author</label>
-                  <input
-                    type="text"
-                    placeholder="Search by author"
+              {/* Author Filter */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-black/5">
+                 <h4 className="font-ui font-bold text-sm uppercase tracking-widest text-parchment-gray mb-4 flex items-center gap-2">
+                    <Users className="w-4 h-4" /> Author
+                 </h4>
+                 <input 
+                    type="text" 
+                    placeholder="Filter by author"
                     value={searchFilters.author}
                     onChange={(e) => setSearchFilters({...searchFilters, author: e.target.value})}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Journal</label>
-                  <select
+                    className="w-full px-3 py-2 bg-library-linen border border-transparent focus:border-vellum-gold rounded outline-none font-ui text-sm transition-colors"
+                 />
+              </div>
+
+              {/* Journal Filter */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-black/5">
+                 <h4 className="font-ui font-bold text-sm uppercase tracking-widest text-parchment-gray mb-4 flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" /> Journal
+                 </h4>
+                 <input 
+                    type="text" 
+                    placeholder="Filter by journal"
                     value={searchFilters.journal}
                     onChange={(e) => setSearchFilters({...searchFilters, journal: e.target.value})}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">All Journals</option>
-                    {displayJournals.map(journal => (
-                      <option key={journal.id} value={journal.name}>{journal.name}</option>
+                    className="w-full px-3 py-2 bg-library-linen border border-transparent focus:border-vellum-gold rounded outline-none font-ui text-sm transition-colors"
+                 />
+              </div>
+
+               {/* Tags Filter */}
+               <div className="bg-white p-6 rounded-lg shadow-sm border border-black/5">
+                 <h4 className="font-ui font-bold text-sm uppercase tracking-widest text-parchment-gray mb-4 flex items-center gap-2">
+                    <Tag className="w-4 h-4" /> Keywords
+                 </h4>
+                 <input 
+                    type="text" 
+                    placeholder="Add tag + Enter"
+                    onKeyPress={(e) => {
+                       if (e.key === 'Enter') {
+                          addKeyword((e.target as HTMLInputElement).value);
+                          (e.target as HTMLInputElement).value = '';
+                       }
+                    }}
+                    className="w-full px-3 py-2 bg-library-linen border border-transparent focus:border-vellum-gold rounded outline-none font-ui text-sm transition-colors mb-3"
+                 />
+                 <div className="flex flex-wrap gap-2">
+                    {searchFilters.keywords.map(k => (
+                       <span key={k} className="px-2 py-1 bg-oxford-blue text-white text-xs rounded flex items-center gap-1 font-ui">
+                          {k} <button onClick={() => removeKeyword(k)}><X className="w-3 h-3" /></button>
+                       </span>
                     ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Department</label>
-                  <input
-                    type="text"
-                    placeholder="Search by department"
-                    value={searchFilters.department}
-                    onChange={(e) => setSearchFilters({...searchFilters, department: e.target.value})}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Year</label>
-                  <input
-                    type="text"
-                    placeholder="e.g., 2024"
+                 </div>
+              </div>
+           </div>
+        </aside>
+
+        {/* Middle Content - Results */}
+        <main className="lg:col-span-6 flex flex-col">
+           {/* Mobile Filter Toggle */}
+           <div className="lg:hidden mb-6">
+              <button 
+                 onClick={() => setShowMobileFilters(true)}
+                 className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded shadow-sm font-ui font-medium text-sm w-full justification-center"
+              >
+                 <Filter className="w-4 h-4" /> Filters
+              </button>
+           </div>
+
+           <div className="flex justify-between items-end mb-8 pb-4 border-b border-vellum-gold/20">
+              <h2 className="text-3xl font-headline font-bold text-oxford-blue">
+                 Latest Publications
+              </h2>
+              <span className="font-ui font-medium text-parchment-gray text-sm">
+                 {indexOfFirstPaper + 1}-{Math.min(indexOfLastPaper, filteredPapers.length)} of {filteredPapers.length}
+              </span>
+           </div>
+
+           <div className="space-y-6">
+              {currentPapers.length === 0 ? (
+                 <div className="text-center py-20 bg-white/50 border border-dashed border-slate-300 rounded-lg">
+                    <p className="font-headline text-xl text-slate-400">No papers found matching your criteria.</p>
+                 </div>
+              ) : (
+                 currentPapers.map((paper, idx) => (
+                    <div 
+                       key={paper.id || paper._id}
+                       style={{ animationDelay: `${idx * 100}ms` }}
+                       className="group bg-white rounded-lg p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 border border-transparent hover:border-vellum-gold/30 animate-in fade-in slide-in-from-bottom-4 fill-mode-backwards relative overflow-hidden"
+                    >
+                       <div className="absolute top-0 left-0 w-1 h-full bg-vellum-gold transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+                       
+                       <div className="flex flex-col gap-4">
+                          <div>
+                             <div className="flex items-center gap-3 mb-3 text-xs font-mono text-parchment-gray">
+                                <span className="bg-library-linen text-oxford-blue px-2 py-1 rounded border border-black/5 uppercase tracking-wider font-bold">
+                                   Article
+                                </span>
+                                 <span className="flex items-center gap-1">
+                                    <Calendar className="w-3 h-3" />
+                                    {(paper.decisionDate || paper.createdAt) && !isNaN(new Date(paper.decisionDate || paper.createdAt).getTime())
+                                       ? new Date(paper.decisionDate || paper.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+                                       : 'Date N/A'}
+                                 </span>
+                                 <span>•</span>
+                             </div>
+
+                             <h3
+                                onClick={() => handlePaperClick(paper.id || paper._id!)}
+                                className="text-xl font-headline font-bold text-oxford-blue mb-2 group-hover:text-blue-700 transition-colors cursor-pointer leading-snug"
+                             >
+                                {paper.title}
+                             </h3>
+
+                             <p className="font-ui text-sm text-slate-500 mb-3 flex items-center gap-2">
+                                <span className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center font-bold text-[10px] text-slate-600">
+                                   {paper.authorName?.charAt(0) || 'A'}
+                                </span>
+                                {paper.authorId ? (
+                                   <span 
+                                     onClick={(e) => {
+                                       e.stopPropagation();
+                                       navigate(`/user/${paper.authorId}`);
+                                     }}
+                                     className="hover:text-oxford-blue hover:underline cursor-pointer transition-colors"
+                                   >
+                                      {paper.authorName || 'Unknown Author'}
+                                   </span>
+                                ) : (
+                                   <span>{paper.authorName || 'Unknown Author'}</span>
+                                )}
+                             </p>
+
+                             <p className="font-body text-classic-ink/80 text-sm mb-4 leading-relaxed line-clamp-2">
+                                {paper.abstract}
+                             </p>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                             <button 
+                                onClick={() => handlePaperClick(paper.id || paper._id!)}
+                                className="flex items-center gap-2 text-oxford-blue font-ui font-semibold text-xs hover:text-blue-700 transition-colors"
+                             >
+                                Read Paper <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                             </button>
+                             
+                             <div className="flex items-center gap-4 text-xs font-mono text-parchment-gray">
+                                <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {paper.views || 0}</span>
+                                <span className="flex items-center gap-1"><Download className="w-3 h-3" /> {paper.downloads || 0}</span>
+                             </div>
+                          </div>
+                       </div>
+                    </div>
+                 ))
+              )}
+           </div>
+
+           {/* Pagination */}
+           {totalPages > 1 && (
+              <div className="flex justify-center mt-12 gap-2">
+                 <button 
+                    onClick={() => setCurrentPage(c => Math.max(1, c - 1))}
+                    disabled={currentPage === 1}
+                    className="p-3 rounded-full border border-slate-300 hover:bg-white hover:border-vellum-gold disabled:opacity-50 transition-colors"
+                 >
+                    <ChevronLeft className="w-5 h-5" />
+                 </button>
+                 <div className="flex items-center px-4 font-ui font-semibold text-oxford-blue">
+                    Page {currentPage} of {totalPages}
+                 </div>
+                 <button 
+                    onClick={() => setCurrentPage(c => Math.min(totalPages, c + 1))}
+                    disabled={currentPage === totalPages}
+                    className="p-3 rounded-full border border-slate-300 hover:bg-white hover:border-vellum-gold disabled:opacity-50 transition-colors"
+                 >
+                    <ChevronRight className="w-5 h-5" />
+                 </button>
+              </div>
+           )}
+        </main>
+
+        {/* Right Sidebar Filters */}
+        <aside className={`lg:col-span-3 space-y-8 ${showMobileFilters ? 'block' : 'hidden lg:block'}`}>
+           <div className="sticky top-24 space-y-6">
+              {/* Year Filter */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-black/5">
+                 <h4 className="font-ui font-bold text-sm uppercase tracking-widest text-parchment-gray mb-4 flex items-center gap-2">
+                    <Calendar className="w-4 h-4" /> Publication Year
+                 </h4>
+                 <input 
+                    type="number" 
+                    placeholder="e.g. 2025"
                     value={searchFilters.year}
                     onChange={(e) => setSearchFilters({...searchFilters, year: e.target.value})}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+                    className="w-full px-3 py-2 bg-library-linen border border-transparent focus:border-vellum-gold rounded outline-none font-ui text-sm transition-colors"
+                 />
               </div>
 
-              {/* Keywords */}
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-slate-700 mb-2">Keywords</label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {searchFilters.keywords.map((keyword, index) => (
-                    <span key={index} className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">
-                      {keyword}
-                      <button
-                        onClick={() => removeKeyword(keyword)}
-                        className="hover:text-blue-900"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  placeholder="Add keyword and press Enter"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      addKeyword((e.target as HTMLInputElement).value);
-                      (e.target as HTMLInputElement).value = '';
-                    }
-                  }}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+              {/* Views Filter */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-black/5">
+                 <h4 className="font-ui font-bold text-sm uppercase tracking-widest text-parchment-gray mb-4 flex items-center gap-2">
+                    <Eye className="w-4 h-4" /> Views
+                 </h4>
+                 <div className="flex gap-2">
+                    <input 
+                       type="number" 
+                       placeholder="Min"
+                       value={searchFilters.minViews}
+                       onChange={(e) => setSearchFilters({...searchFilters, minViews: e.target.value})}
+                       className="w-1/2 px-3 py-2 bg-library-linen border border-transparent focus:border-vellum-gold rounded outline-none font-ui text-sm transition-colors"
+                    />
+                    <input 
+                       type="number" 
+                       placeholder="Max"
+                       value={searchFilters.maxViews}
+                       onChange={(e) => setSearchFilters({...searchFilters, maxViews: e.target.value})}
+                       className="w-1/2 px-3 py-2 bg-library-linen border border-transparent focus:border-vellum-gold rounded outline-none font-ui text-sm transition-colors"
+                    />
+                 </div>
               </div>
-            </div>
-          )}
-        </div>
 
-        {/* Results Summary */}
-        <div className="flex justify-between items-center mb-6">
-          <p className="text-slate-600">
-            Showing {currentPapers.length} of {filteredPapers.length} published papers
-          </p>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-600">Sort by:</span>
-            <select className="px-3 py-1 border border-slate-300 rounded-lg text-sm">
-              <option>Most Recent</option>
-              <option>Most Cited</option>
-              <option>Most Downloaded</option>
-              <option>Title A-Z</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Papers List */}
-        <div className="space-y-6">
-          {currentPapers.map((paper) => (
-            <div key={paper.id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-slate-900 mb-2 hover:text-blue-600 cursor-pointer">
-                    {paper.title}
-                  </h3>
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600 mb-3">
-                    <div className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      {paper.authors.join(', ')}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <BookOpen className="w-4 h-4" />
-                      {paper.journal}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {paper.publicationDate}
-                    </div>
-                  </div>
-                  <p className="text-slate-700 mb-4 line-clamp-3">{paper.abstract}</p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {paper.keywords.slice(0, 5).map((keyword, index) => (
-                      <span key={index} className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-700 text-xs rounded-full">
-                        <Tag className="w-3 h-3" />
-                        {keyword}
-                      </span>
-                    ))}
-                    {paper.keywords.length > 5 && (
-                      <span className="text-xs text-slate-500">+{paper.keywords.length - 5} more</span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-slate-600">
-                    <span>{paper.citations} citations</span>
-                    <span>{paper.downloads} downloads</span>
-                    <span>{paper.department}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2 ml-6">
-                  <button
-                    onClick={() => handleViewPaper(paper)}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-                  >
-                    <Eye className="w-4 h-4" />
-                    Read Paper
-                  </button>
-                  <button
-                    onClick={() => handleDownload(paper.id)}
-                    className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg"
-                  >
-                    <Download className="w-4 h-4" />
-                    Download
-                  </button>
-                </div>
+              {/* Downloads Filter */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-black/5">
+                 <h4 className="font-ui font-bold text-sm uppercase tracking-widest text-parchment-gray mb-4 flex items-center gap-2">
+                    <Download className="w-4 h-4" /> Downloads
+                 </h4>
+                 <div className="flex gap-2">
+                    <input 
+                       type="number" 
+                       placeholder="Min"
+                       value={searchFilters.minDownloads}
+                       onChange={(e) => setSearchFilters({...searchFilters, minDownloads: e.target.value})}
+                       className="w-1/2 px-3 py-2 bg-library-linen border border-transparent focus:border-vellum-gold rounded outline-none font-ui text-sm transition-colors"
+                    />
+                    <input 
+                       type="number" 
+                       placeholder="Max"
+                       value={searchFilters.maxDownloads}
+                       onChange={(e) => setSearchFilters({...searchFilters, maxDownloads: e.target.value})}
+                       className="w-1/2 px-3 py-2 bg-library-linen border border-transparent focus:border-vellum-gold rounded outline-none font-ui text-sm transition-colors"
+                    />
+                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-2 mt-8">
-            <button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-              className="flex items-center gap-1 px-3 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Previous
-            </button>
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`px-3 py-2 border rounded-lg ${
-                  currentPage === page
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'border-slate-300 hover:bg-slate-50'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-
-            <button
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages}
-              className="flex items-center gap-1 px-3 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-
-        {filteredPapers.length === 0 && (
-          <div className="text-center py-12">
-            <BookOpen className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">No papers found</h3>
-            <p className="text-slate-600">Try adjusting your search criteria or filters.</p>
-          </div>
-        )}
+           </div>
+        </aside>
       </div>
     </div>
   );

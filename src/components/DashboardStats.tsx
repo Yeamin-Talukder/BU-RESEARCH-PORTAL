@@ -8,8 +8,17 @@ const DashboardStats: React.FC = () => {
 
   // Custom content based on Role Requirements
   const getStats = () => {
-    if (!user) return [];
-    switch (user.role) {
+    if (!user || !user.roles) return [];
+
+    // Determine primary role for dashboard view
+    const roles = user.roles as any[];
+    let primaryRole = 'Author';
+
+    if (roles.includes('Admin') || roles.includes('Super Admin')) primaryRole = 'Admin';
+    else if (roles.includes('Editor') || roles.includes('Associate Editor') || roles.includes('Editor-in-Chief')) primaryRole = 'Editor';
+    else if (roles.includes('Reviewer')) primaryRole = 'Reviewer'; // Assuming Reviewer specific stats exists or fallback
+
+    switch (primaryRole) {
       case 'Author':
         return [
           {
@@ -156,7 +165,7 @@ const DashboardStats: React.FC = () => {
             {getTimeGreeting()}, {user.name}! 👋
           </h2>
           <p className="text-slate-600 text-lg md:text-xl">
-            Here's your <span className="font-semibold text-slate-700">{user.role}</span> dashboard overview
+            Here's your <span className="font-semibold text-slate-700">{user.roles?.[0] || 'User'}</span> dashboard overview
           </p>
         </div>
 
@@ -184,11 +193,10 @@ const DashboardStats: React.FC = () => {
                     </div>
 
                     {/* Trend Badge */}
-                    <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 ${
-                      stat.trendUp
-                        ? 'bg-green-100/80 text-green-700 group-hover:bg-green-200/80'
-                        : 'bg-amber-100/80 text-amber-700 group-hover:bg-amber-200/80'
-                    }`}>
+                    <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 ${stat.trendUp
+                      ? 'bg-green-100/80 text-green-700 group-hover:bg-green-200/80'
+                      : 'bg-amber-100/80 text-amber-700 group-hover:bg-amber-200/80'
+                      }`}>
                       {stat.trendUp ? (
                         <TrendingUp className="w-3.5 h-3.5" />
                       ) : (

@@ -1,14 +1,23 @@
 // src/types/index.ts
 
-export type UserRole = 'Guest' | 'Student' | 'Author' | 'Reviewer' | 'Editor' | 'Admin';
+export type UserRole = 'Guest' | 'Student' | 'Author' | 'Reviewer' | 'Editor' | 'Admin' | 'Publisher';
 
-export type PaperStatus = 'Submitted' | 'Under Review' | 'Revision Required' | 'Accepted' | 'Rejected' | 'Published';
+export type PaperStatus = 'Submitted' | 'Under Review' | 'Revision Required' | 'Accepted' | 'Rejected' | 'Published' | 'final_submission_requested' | 'final_submitted' | 'ready_for_publication';
 
 export interface User {
   id: string;
   name: string;
-  role: UserRole;
+  email: string;
+  roles: UserRole[];
   department?: string;
+  bio?: string;
+  phone?: string;
+  institution?: string;
+  photoUrl?: string;
+  editorJournals?: { id: string; name: string }[];
+  reviewerJournals?: { id: string; name: string }[];
+  assignedJournals?: { id: string; name: string }[];
+  favorites?: string[];
 }
 
 export interface Paper {

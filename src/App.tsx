@@ -1,192 +1,213 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import DashboardStats from './components/DashboardStats';
+import Home from './components/Home';
 import Login from './components/Login';
 import Register from './components/Register';
-import AuthorDashboard from './components/AuthorDashboard'; // The new dashboard we created
-import PaperBrowser from './components/PaperBrowser';
+import AuthorDashboard from './components/AuthorDashboard';
+
+import Admin from './components/Admin';
+import Editor from './components/Editor';
+import Reviewer from './components/Reviewer';
 import { useAuth } from './context/AuthContext';
-import { FileText, Download, BookOpen, Eye, Star } from 'lucide-react';
+import Verification from './components/Verification';
+import Profile from './components/Profile';
+import SubmitPaper from './components/SubmitPaper';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
+import AboutUs from './components/AboutUs';
+import Archive from './components/Archive';
+import UserProfilePublic from './components/UserProfilePublic';
+import JournalProfile from './components/JournalProfile';
+import DashboardLayout from './components/layouts/DashboardLayout';
+import { Toaster } from '@/components/ui/sonner';
+import { Routes, Route, Navigate, Outlet, useLocation, useOutletContext } from 'react-router-dom';
+import PaperDetailsPublic from './components/PaperDetailsPublic';
+
+// Public Layout
+const PublicLayout = () => {
+  const location = useLocation();
+  const isAuthPage = ['/login', '/register', '/verify'].includes(location.pathname);
+
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
+      <Navbar />
+      <div className="flex-1">
+        <Outlet />
+      </div>
+      {!isAuthPage && (
+        <footer className="bg-oxford-blue text-white py-16 mt-auto border-t border-white/10 relative overflow-hidden">
+          {/* Subtle background pattern */}
+          <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+            backgroundSize: '24px 24px'
+          }}></div>
+
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+              {/* Brand Column */}
+              <div className="md:col-span-1 space-y-6">
+                <div className="flex items-center gap-3 group cursor-default">
+                  <div className="bg-gradient-to-br from-vellum-gold to-yellow-600 p-2.5 rounded-lg text-oxford-blue font-bold shadow-lg transform group-hover:rotate-6 transition-transform duration-300">BU</div>
+                  <div>
+                    <p className="font-headline font-bold text-xl tracking-tight">Barishal University</p>
+                    <p className="text-xs text-blue-200 uppercase tracking-widest font-ui">Research Portal</p>
+                  </div>
+                </div>
+                <p className="text-blue-100/80 text-sm leading-relaxed font-body">
+                   Advancing human knowledge through rigorous peer-reviewed scholarship and open academic collaboration.
+                </p>
+              </div>
+
+              {/* Quick Links */}
+              <div>
+                 <h4 className="font-headline font-semibold text-lg mb-6 text-vellum-gold">Explore</h4>
+                 <ul className="space-y-3 font-ui text-sm text-blue-100/80">
+                    <li><a href="/" className="hover:text-white hover:translate-x-1 transition-all inline-block">Home</a></li>
+                    <li><a href="/papers" className="hover:text-white hover:translate-x-1 transition-all inline-block">Browse Papers</a></li>
+                 </ul>
+              </div>
+
+              {/* Resources */}
+              <div className="md:col-span-2">
+                 <h4 className="font-headline font-semibold text-lg mb-6 text-vellum-gold">Resources</h4>
+                 <ul className="space-y-3 font-ui text-sm text-blue-100/80">
+                    <li><a href="/about" className="hover:text-white hover:translate-x-1 transition-all inline-block">About Us</a></li>
+                    <li><a href="/login" className="hover:text-white hover:translate-x-1 transition-all inline-block">Login</a></li>
+                    <li><a href="/register" className="hover:text-white hover:translate-x-1 transition-all inline-block">Register</a></li>
+                 </ul>
+              </div>
+            </div>
+
+            {/* Copyright */}
+            <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-blue-300 font-ui">
+              <p>© 2026 Barishal University. All rights reserved.</p>
+              <div className="flex gap-6">
+                 <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                 <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+                 <a href="#" className="hover:text-white transition-colors">Accessibility</a>
+              </div>
+            </div>
+          </div>
+        </footer>
+      )}
+      <Toaster />
+    </div>
+  );
+};
+
+// Dashboard Wrapper with Role State
+const DashboardWrapper = () => {
+  const { user, isLoading } = useAuth();
+  const [activeRole, setActiveRole] = useState<string>('Author');
+
+  console.log("DashboardWrapper Check:", { user, isLoading });
+
+  React.useEffect(() => {
+    if (user?.roles && user.roles.length > 0) {
+      console.log("Setting active role based on:", user.roles);
+      if (user.roles.includes('Admin')) setActiveRole('Admin');
+      else if (user.roles.includes('Publisher')) setActiveRole('Publisher');
+      else if (user.roles.includes('Editor')) setActiveRole('Editor');
+      else if (user.roles.includes('Reviewer')) setActiveRole('Reviewer');
+      else setActiveRole(user.roles[0]);
+    }
+  }, [user]);
+
+  if (isLoading) {
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+  }
+
+  if (!user) {
+    console.log("No user found, redirecting.");
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
+    <DashboardLayout currentRole={activeRole}>
+      <Outlet context={{ activeRole }} />
+      <Toaster />
+    </DashboardLayout>
+  );
+};
+
+// Dashboard Home (Overview)
+const DashboardHome = () => {
+  const { activeRole } = useOutletContext<{ activeRole: string }>();
+  if (activeRole === 'Admin') return <Admin />;
+  if (activeRole === 'Editor') return <Editor />;
+  if (activeRole === 'Reviewer') return <Reviewer />;
+  if (activeRole === 'Publisher') return <PublisherDashboard />;
+  return <AuthorDashboard />;
+};
+
+// Import PublisherDashboard
+import PublisherDashboard from './components/PublisherDashboard';
+
+// Home Page Component
+
+
+// Import useNavigate inside Home if needed or move Home outside
+import { useNavigate } from 'react-router-dom';
 
 const App: React.FC = () => {
   const { user, login } = useAuth();
-  
-  // State to manage which page is currently visible
-  const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'register' | 'papers'>('home');
-  const [hoveredPaper, setHoveredPaper] = useState<number | null>(null);
+  const navigate = useNavigate();
 
-  // Handle Login: Update Auth Context and redirect to Home
-  const handleLogin = (role: string) => {
-    login(role as any);
-    setCurrentPage('home');
+  const handleLogin = (userData: any) => {
+    login({
+      id: userData.id || '123',
+      name: userData.name || 'User',
+      email: userData.email,
+      roles: userData.roles || (userData.role ? [userData.role] : ['Author']),
+      department: 'General'
+    });
+    navigate('/dashboard');
   };
 
-  // Mock Data for Public Papers (accessible to Guests/Students)
-  const publicPapers = [
-    { 
-      id: 1, 
-      title: "AI in Sustainable Agriculture", 
-      author: "Dr. A. Rahman", 
-      dept: "CSE",
-      views: 1240,
-      rating: 4.8,
-      excerpt: "Exploring machine learning applications in agricultural optimization and crop yield prediction."
-    },
-    { 
-      id: 2, 
-      title: "Supply Chain Optimization", 
-      author: "K. Ahmed", 
-      dept: "BBA",
-      views: 856,
-      rating: 4.6,
-      excerpt: "Advanced techniques for streamlining supply chain operations using modern analytics."
-    },
-    { 
-      id: 3, 
-      title: "Renewable Energy Grid Systems", 
-      author: "S. Jahan", 
-      dept: "EEE",
-      views: 2103,
-      rating: 4.9,
-      excerpt: "Integration of renewable energy sources into modern electrical grid infrastructure."
-    },
-  ];
+  const handleRegisterSuccess = (email: string) => {
+    navigate('/verify', { state: { email } });
+  };
 
-  // --- RENDER HELPERS ---
-
-  // 1. The Public View (For Students & Guests)
-  const renderPublicView = () => (
-    <>
-      <Hero />
-      <div className="relative overflow-hidden py-16 md:py-20">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-20 -right-20 w-60 h-60 bg-blue-200/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-blue-200/10 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4">
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-4">
-              <BookOpen className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
-              <h3 className="text-3xl md:text-4xl font-bold text-slate-900">
-                Latest Publications
-              </h3>
-            </div>
-            <p className="text-slate-600 text-lg">Explore cutting-edge research papers from our community</p>
-            <div className="mt-4 h-1 w-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {publicPapers.map((paper) => (
-              <div
-                key={paper.id}
-                onMouseEnter={() => setHoveredPaper(paper.id)}
-                onMouseLeave={() => setHoveredPaper(null)}
-                className="group relative overflow-hidden bg-slate-50 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="relative p-6 md:p-8 h-full flex flex-col">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 rounded-lg bg-gradient-to-br from-blue-100 to-purple-100 group-hover:shadow-lg transition-all duration-300">
-                      <FileText className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-yellow-100/80 text-yellow-700">
-                      <Star className="w-3.5 h-3.5 fill-current" />
-                      <span className="text-xs font-semibold">{paper.rating}</span>
-                    </div>
-                  </div>
-                  <h4 className="text-lg md:text-xl font-semibold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
-                    {paper.title}
-                  </h4>
-                  <p className="text-sm text-slate-600 mb-4 line-clamp-2 flex-grow">
-                    {paper.excerpt}
-                  </p>
-                  <div className="mb-4 pb-4 border-b border-slate-200/50">
-                    <p className="text-sm text-slate-700 font-medium">{paper.author}</p>
-                    <p className="text-xs text-slate-500">Department of {paper.dept}</p>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-1 text-xs text-slate-500">
-                      <Eye className="w-3.5 h-3.5" /> {paper.views}
-                    </span>
-                    <button className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold transition-all duration-300 ${hoveredPaper === paper.id ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-slate-700'}`}>
-                      <Download className="w-4 h-4" /> <span className="text-sm">PDF</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </>
-  );
+  const handleVerified = () => {
+    navigate('/login');
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
-      <div className="min-h-screen bg-slate-50 font-sans antialiased">
-      <Navbar onNavigate={setCurrentPage} />
+    <Routes>
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/archive" element={<Archive />} />
+        <Route path="/papers" element={<Navigate to="/archive" replace />} />
+        <Route path="/paper/:id" element={<PaperDetailsPublic />} />
+        <Route path="/login" element={<Login onLogin={handleLogin} onSwitchToRegister={() => navigate('/register')} />} />
+        <Route path="/register" element={<Register onRegisterSuccess={handleRegisterSuccess} onSwitchToLogin={() => navigate('/login')} />} />
+        <Route path="/verify" element={<Verification onVerified={handleVerified} />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/user/:id" element={<UserProfilePublic />} />
+        <Route path="/journal/:id" element={<JournalProfile />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+      </Route>
 
-      {/* --- PAGE ROUTING LOGIC --- */}
+      <Route path="/dashboard" element={<DashboardWrapper />}>
+        <Route index element={<DashboardHome />} />
+        <Route path="users" element={<Admin />} />
+        <Route path="submissions" element={<Admin />} />
+        <Route path="my-papers" element={<AuthorDashboard />} />
+        <Route path="submit" element={<SubmitPaper onCancel={() => navigate('/dashboard')} onSubmitSuccess={() => navigate('/dashboard')} currentUser={user!} />} />
+        <Route path="reviews" element={<Reviewer />} />
+        <Route path="queue" element={<Editor />} />
+        <Route path="reviewers" element={<Editor />} />
+        <Route path="stats" element={<Admin />} />
+      </Route>
 
-      {/* 1. LOGIN PAGE */}
-      {currentPage === 'login' && (
-        <Login 
-          onSwitchToRegister={() => setCurrentPage('register')} 
-          onLogin={handleLogin}
-        />
-      )}
+      {/* Profile uses Dashboard Layout but accessed via /profile */}
+      <Route path="/profile" element={<DashboardWrapper />}>
+        <Route index element={<Profile />} />
+      </Route>
 
-      {/* 2. REGISTER PAGE */}
-      {currentPage === 'register' && (
-        <Register onSwitchToLogin={() => setCurrentPage('login')} />
-      )}
-
-      {/* 3. PAPERS BROWSER PAGE */}
-      {currentPage === 'papers' && (
-        <PaperBrowser />
-      )}
-
-      {/* 4. HOME / DASHBOARD PAGE */}
-      {currentPage === 'home' && (
-        <>
-          {/* SCENARIO A: LOGGED IN AS AUTHOR */}
-          {user?.role === 'Author' ? (
-             <AuthorDashboard />
-          ) : 
-          
-          /* SCENARIO B: LOGGED IN AS EDITOR/ADMIN/REVIEWER */
-          user && user.role !== 'Student' ? (
-             <DashboardStats />
-          ) :
-
-          /* SCENARIO C: PUBLIC / STUDENT VIEW (Default) */
-             renderPublicView()
-          }
-        </>
-      )}
-
-      <footer className="bg-slate-900 text-slate-300 py-8 mt-auto border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-indigo-500 to-cyan-400 p-2 rounded-md text-white font-bold">BU</div>
-              <div>
-                <p className="font-semibold">University Research Portal</p>
-                <p className="text-xs text-slate-400">Connecting researchers and readers since 2026</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-sm text-slate-400">
-            <p>© 2026 University Research Portal. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-      </div>
-    </div>
+      <Route path="*" element={<div className="p-4">Page not found</div>} />
+    </Routes>
   );
 };
 
