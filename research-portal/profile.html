@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - University of Barishal Research Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=EB+Garamond:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="logo-area">
+            <h1>University Of Barishal</h1>
+            <h2>Research Portal</h2>
+        </div>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-link">HOME</a>
+            <a href="dashboard.html" class="nav-link">DASHBOARD</a>
+            <a href="about.html" class="nav-link">ABOUT US</a>
+        </nav>
+        <div class="user-actions">
+            <!-- Simplified notification for profile page -->
+             <div class="notification-container">
+                <button class="icon-btn" id="notification-btn" aria-label="Notifications">
+                    <i class="ph-fill ph-bell"></i>
+                </button>
+                 <div class="notification-panel" id="notification-panel">
+                    <div class="notification-header"><h3>Notifications</h3></div>
+                    <ul class="notification-list"><li class="notification-item"><p class="notif-text">No new notifications</p></li></ul>
+                </div>
+            </div>
+            <div class="profile-container">
+                <button class="icon-btn user-btn active" id="profile-btn" aria-label="Profile">
+                    <i class="ph ph-user"></i>
+                </button>
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <div class="dropdown-header">
+                        <div class="user-avatar-large"><i class="ph ph-user"></i></div>
+                        <div class="user-details"><span class="user-name">John Doe</span><span class="user-email">john.doe@barishal.edu.bd</span></div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <ul class="dropdown-menu">
+                        <li><a href="profile.html" class="dropdown-item"><i class="ph ph-user-circle"></i> View Profile</a></li>
+                        <li><a href="#" class="dropdown-item text-danger"><i class="ph ph-sign-out"></i> Sign Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout-container" style="justify-content: center; align-items: start; padding-top: 4rem;">
+        <div class="main-feed" style="max-width: 800px; flex: none; width: 100%;">
+            <br>
+            <div style="text-align: center;">
+                <div style="width: 120px; height: 120px; background: var(--white); border: 4px solid var(--vellum-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 4rem; color: var(--oxford-blue);">
+                    <i class="ph ph-user"></i>
+                </div>
+                <h2 style="font-family: var(--font-headline); color: var(--oxford-blue); font-size: 2.2rem; margin-top: 1.5rem;">John Doe</h2>
+                <p style="color: var(--parchment-gray); font-size: 1.1rem;">Computer Science & Engineering</p>
+                <p style="color: var(--oxford-blue); margin-top: 0.5rem;">john.doe@barishal.edu.bd</p>
+                
+                <div style="margin-top: 2rem;">
+                    <button class="btn btn-primary" style="margin: 0 auto;">Edit Profile</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

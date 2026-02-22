@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - University of Barishal Research Portal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=EB+Garamond:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <!-- Left Side: Brand & Visual -->
+        <div class="login-brand-side">
+            <div class="brand-content">
+                <div class="brand-logo">
+                    <i class="ph-fill ph-student"></i>
+                </div>
+                <h1>University Of Barishal</h1>
+                <h2>Research Portal</h2>
+                <p class="brand-quote">"Join a community dedicated to pushing the boundaries of knowledge."</p>
+            </div>
+            <div class="brand-overlay"></div>
+        </div>
+
+        <!-- Right Side: Registration Form -->
+        <div class="login-form-side">
+            <div class="form-wrapper" style="max-width: 500px;"> <!-- Slightly wider for more fields -->
+                <div class="form-header">
+                    <h3>Create Account</h3>
+                    <p>Join the research community today.</p>
+                </div>
+                
+                <form class="login-form" action="dashboard.html">
+                    <div class="input-group">
+                        <label for="fullname">Full Name</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-user"></i>
+                            <input type="text" id="fullname" placeholder="John Doe" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="email">University Email</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-envelope-simple"></i>
+                            <input type="email" id="email" placeholder="name@barishal.edu.bd" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="department">Department</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-buildings"></i>
+                            <select id="department" required>
+                                <option value="" disabled selected>Select your department</option>
+                                <option value="cse">Computer Science & Engineering</option>
+                                <option value="math">Mathematics</option>
+                                <option value="physics">Physics</option>
+                                <option value="chemistry">Chemistry</option>
+                                <option value="english">English</option>
+                                <option value="economics">Economics</option>
+                            </select>
+                            <i class="ph ph-caret-down" style="left: auto; right: 1rem; color: var(--parchment-gray);"></i>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-lock-key"></i>
+                            <input type="password" id="password" placeholder="Create a password" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="confirm-password">Confirm Password</label>
+                        <div class="input-wrapper">
+                            <i class="ph ph-lock-key"></i>
+                            <input type="password" id="confirm-password" placeholder="Confirm your password" required>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                         <label class="checkbox-container">
+                            <input type="checkbox" required>
+                            <span class="checkmark"></span>
+                            I agree to the <a href="#" style="color: var(--oxford-blue); font-weight: 600;">Terms & Conditions</a>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-login">
+                        Create Account <i class="ph ph-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="form-footer">
+                    <p>Already have an account? <a href="login.html">Sign In</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
