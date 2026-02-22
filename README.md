@@ -4,7 +4,7 @@
 <p align="center">
   <strong>A Web-Based Academic Research Submission & Review Management System</strong>
 </p>
-=======
+
 
 # React + TypeScript + Vite
 
