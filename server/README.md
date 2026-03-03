@@ -59,7 +59,6 @@ Visit the live site at: [https://doccare-7847e.firebaseapp.com/](https://doccare
 
 ## Contact
 
-For any inquiries or feedback, please reach out to us at: mimam22.cse@bu.ac.bd
 
 ---
 
