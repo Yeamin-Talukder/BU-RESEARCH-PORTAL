@@ -58,10 +58,11 @@ Developed by the students of the **Department of Computer Science & Engineering,
 | Name | Role / Info |
 | :--- | :--- |
 | **MD Yeamin Talukder** | 22 CSE 020 (Lead Developer) |
-| **Khan Md Omar Faruk** | 22 CSE 018 |
-| **MD Abdullah** | 22 CSE 048 |
-| **Md Abdullah Al Noman** | 22 CSE 038 |
 | **Md Riajuddin Sikder** | 22 CSE 016 |
+| **MD Abdullah** | 22 CSE 048 |
+| **Likhon Mandal** | 22 CSE 023 |
+| **Md Abdullah Al Noman** | 22 CSE 038 |
+| **Khan Md Omar Faruk** | 22 CSE 018 |
 
 ---
 
