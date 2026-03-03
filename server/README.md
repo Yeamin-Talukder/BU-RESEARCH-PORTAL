@@ -1,71 +1,102 @@
-﻿# DocCare
+﻿# BU Research Portal - Server
 
-Welcome to DocCare, your most trusted health partner for comprehensive and efficient doctor consultation services. Our platform connects you with experienced healthcare professionals to address all your medical needs.
+The backend service for the Barishal University Research Portal, a comprehensive manuscript submission and peer-review management system.
 
-## Live Site
+## 🚀 Technology Stack
 
-Visit the live site at: [https://doccare-7847e.firebaseapp.com/](https://doccare-7847e.firebaseapp.com/)
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: MongoDB
+- **Authentication**: JWT (JSON Web Tokens) & Bcrypt
+- **Mailing**: Nodemailer
+- **File Handling**: Multer
+- **Development**: Nodemon
 
-## Repository Links
+## 🛠️ Features
 
-- Client Site Repository: [GitHub - Client](https://github.com/mdimamhosen/DocCare-Client)
-- Server Site Repository: [GitHub - Server](https://github.com/mdimamhosen/DocCare-Server)
+- **Authentication System**: Secure registration, email verification, and password reset.
+- **Role-Based Access Control**: Support for Authors, Reviewers, Associated Editors, Editor-in-Chiefs, Admins, and Super Admins.
+- **Manuscript Management**: Submission, tracking, and versioning.
+- **Peer Review Workflow**: Reviewer assignment, recommendation, and editorial decision making.
+- **Archive System**: Management of Volumes and Issues.
+- **Notification System**: In-app and email notifications.
+- **Seeding System**: Built-in scripts for initializing users, departments, and journals.
 
-## Key Features
+## 📋 Prerequisites
 
-- **Add Services**: Healthcare providers can add new services, making it easy to expand offerings.
-- **Book Services**: Users can book consultation services directly through the platform.
-- **Manage Services**: Providers can update or delete their services, ensuring the information is always current.
-- **Doctor Profiles**: View detailed profiles of all registered doctors, including their specialties and credentials.
-- **Responsive Design**: The website is fully responsive and works seamlessly on all types of devices.
-- **Technology Stack**: Built using React, Tailwind CSS, MongoDB, Express.js, with animations powered by AOS and Animate.css.
+- [Node.js](https://nodejs.org/) (v14+)
+- [MongoDB](https://www.mongodb.com/) (Local or Atlas)
+- SMTP credentials (for email notifications)
 
-## Categories
+## ⚙️ Setup Instructions
 
-**Consultation Services by Doctors**
-
-## Additional Features
-
-- **Appointment Scheduling**: 24/7 service to book appointments at your convenience.
-- **Emergency Cases**: Quick access to emergency contact numbers and services.
-- **Special Offers**: Get information on special offers and discounts on various healthcare services.
-- **Service Details**: In-depth details about each service, including provider information and available times.
-- **User Authentication**: Secure login and user management system for both patients and doctors
-
-## Installation and Setup
-
-1. Clone the client repository:
-   ```sh
-   git clone https://github.com/Porgramming-Hero-web-course/b9a11-client-side-mdimamhosen.git
-   ```
-2. Clone the server repository:
-   ```sh
-   git clone https://github.com/Porgramming-Hero-web-course/b9a11-server-side-mdimamhosen.git
-   ```
-3. Install dependencies for both client and server:
-   ```sh
-   cd client
-   npm install
-   cd ../server
+1. **Install Dependencies**:
+   ```bash
    npm install
    ```
-4. Start the development server:
-   ```sh
-   cd client
-   npm start
-   cd ../server
-   npm start
+
+2. **Environment Configuration**:
+   Create a `.env` file in the root directory and add the following:
+   ```env
+   PORT=3001
+   MONGODB_URI=mongodb://localhost:27017/research
+   EMAIL_USER=your-email@gmail.com
+   EMAIL_PASS=your-app-password
+   ACCESS_TOKEN_SECRET=your_access_secret
+   REFRESH_TOKEN_SECRET=your_refresh_secret
    ```
 
-## Contact
+3. **Running the Server**:
+   ```bash
+   npm start
+   ```
+   The server will be available at `http://localhost:3001`.
 
+## 🗄️ Database Seeding
 
----
+The server includes several seeding scripts to initialize the system:
 
-Thank you for choosing DocCare. We are committed to providing you with the best healthcare consultation services.
+- `index.js`: Automatically seeds the Super Admin, a default Publisher, a default Journal, and Departments on startup.
+- `seed_demo_users.js`: Seeds sample users with various roles.
+- `seed-demo-papers.js`: Seeds sample manuscripts.
+- `seed-archive.js`: Seeds initial volumes and issues.
 
+To run a specific seed script:
+```bash
+node seed_demo_users.js
 ```
 
-This `README.md` file provides a clear and concise overview of your project, its key features, installation instructions, and contact information.
-```
-# DocCare-Server
+## 🛣️ API Endpoints Summary
+
+### Authentication
+- `POST /register`: New user registration.
+- `POST /verify-email`: Verify email with 6-digit code.
+- `POST /login`: User login and token generation.
+- `POST /auth/forgot-password`: Request password reset code.
+- `POST /auth/reset-password`: Reset password with code.
+
+### User Management
+- `GET /users`: Fetch all users (Admin/Editor).
+- `GET /users/:id`: Fetch detailed user profile.
+
+### Manuscripts & Archive
+- `GET /volumes`: Get all volumes.
+- `POST /volumes`: Create a new volume (Admin).
+- `GET /volumes/:id/issues`: Get issues for a volume.
+- `POST /issues`: Create a new issue.
+- `PUT /issues/:id/publish`: Mark an issue as published.
+- `GET /issues/:id/papers`: Get published papers in an issue.
+- `PUT /papers/:id/assign-issue`: Assign paper to an issue.
+
+### Notifications
+- `GET /notifications/:userId`: Fetch notifications for a user.
+- `GET /notifications/unread-count`: Get unread count.
+- `PUT /notifications/mark-read`: Mark specified notifications as read.
+- `PUT /notifications/read-all`: Mark all notifications as read for a user.
+
+## 📁 Directory Structure
+
+- `index.js`: Main application entry point and API definitions.
+- `uploads/`: directory for storing profile pictures and manuscript files.
+- `seed*.js`: Various database seeding utilities.
+- `.env`: Environment variables (do not commit).
